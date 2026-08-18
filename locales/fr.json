@@ -154,9 +154,12 @@
     "noChanges": "Aucun changement depuis le dernier scan",
     "changes": "Changements",
     "critical": "Critiques",
-    "new": "NOUVEAU"
+    "new": "NOUVEAU",
+    "correlationActive": "CORRÉLATION INTER-DOMAINES"
   },
   "metrics": {
+    "riskIndex": "Indice de Risque",
+    "drivenBy": "Principaux facteurs",
     "wtiCrude": "Pétrole WTI",
     "brent": "Brent",
     "natGas": "Gaz Naturel",
