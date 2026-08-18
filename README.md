@@ -439,7 +439,27 @@ When running `npm run dev`:
 | `GET /` | Jarvis HUD dashboard |
 | `GET /api/data` | Current synthesized intelligence data (JSON) |
 | `GET /api/health` | Server status, uptime, source count, LLM status |
+| `GET /api/history` | Recent sweep history with deltas (hot window, max 3 runs) |
 | `GET /events` | SSE stream for live push updates |
+
+---
+
+## MCP Server
+
+Crucix ships a minimal read-only [MCP](https://modelcontextprotocol.io) server (`mcp/server.mjs`) so
+MCP-compatible agents (Claude Code, Claude Desktop, etc.) can query a running Crucix instance directly.
+It's a thin stdio JSON-RPC proxy over the dashboard's existing HTTP API above — hand-rolled with no new
+dependency, matching the rest of the codebase. It does not run sweeps itself; point it at a running
+`npm run dev` instance (default `http://localhost:3117`, override with `CRUCIX_API_URL`).
+
+```bash
+npm run mcp          # node mcp/server.mjs — requires a Crucix dashboard already running
+```
+
+Tools exposed: `crucix_status` (health), `crucix_brief` (compact text summary — direction, risk index,
+correlation, key metrics, top OSINT, top ideas), `crucix_data` (full or filtered synthesized data as
+JSON), `crucix_history` (recent sweeps + deltas). To wire it into an MCP client, point it at
+`node /path/to/crucix/mcp/server.mjs` (or `npx crucix-mcp` from within the repo) as a stdio server.
 
 ---
 
