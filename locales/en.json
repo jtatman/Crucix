@@ -154,9 +154,12 @@
     "noChanges": "No changes since last sweep",
     "changes": "Changes",
     "critical": "Critical",
-    "new": "NEW"
+    "new": "NEW",
+    "correlationActive": "CROSS-STREAM CORRELATION"
   },
   "metrics": {
+    "riskIndex": "Risk Index",
+    "drivenBy": "Driven by",
     "wtiCrude": "WTI Crude",
     "brent": "Brent",
     "natGas": "Nat Gas",

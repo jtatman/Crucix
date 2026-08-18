@@ -41,6 +41,17 @@ export default {
         // urgent_posts: 3,     // need ±3 urgent posts to flag
         // thermal_total: 1000, // need ±1000 thermal detections
       },
+      correlation: {
+        // minDomains: 4, // require signals across 4+ domains before flagging a convergence (default: 3)
+      },
+    },
+  },
+
+  // Composite risk index thresholds — override defaults from lib/risk/index.mjs
+  risk: {
+    thresholds: {
+      // Example overrides (uncomment to customize):
+      // vix: { calm: 15, crisis: 35 },
     },
   },
 };

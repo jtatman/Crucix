@@ -642,6 +642,11 @@ function renderLeftRail(){
     </div>
     <div class="g-panel">
       <div class="sec-head"><h3>${t('panels.riskGauges','Risk Gauges')}</h3><span class="badge">${t('badges.stress','STRESS')}</span></div>
+      ${D.riskIndex ? `<div class="econ-row" style="border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:6px;margin-bottom:6px">
+        <span class="elabel" style="font-weight:600">${t('metrics.riskIndex','Risk Index')}</span>
+        <span class="eval" style="color:${riskLevelColor(D.riskIndex.level)};font-weight:700">${D.riskIndex.score}/100 &middot; ${D.riskIndex.level.toUpperCase()}</span>
+      </div>
+      ${Object.entries(D.riskIndex.domains).sort((a,b)=>b[1]-a[1]).slice(0,2).filter(([,s])=>s>0).length ? `<div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin:-2px 0 6px">${t('metrics.drivenBy','Driven by')}: ${Object.entries(D.riskIndex.domains).sort((a,b)=>b[1]-a[1]).slice(0,2).filter(([,s])=>s>0).map(([d,s])=>`${d} ${s}`).join(', ')}</div>` : ''}` : ''}
       <div class="econ-row"><span class="elabel">${t('metrics.vix','VIX')} (Fear)</span><span class="eval" style="color:${vix?.value>20?'var(--warn)':'var(--accent)'}">${vix?.value||'--'}</span></div>
       <div class="econ-row"><span class="elabel">${t('metrics.hySpread','HY Spread')}</span><span class="eval">${hy?.value||'--'}</span></div>
       <div class="econ-row"><span class="elabel">${t('metrics.usdIndex','USD Index')}</span><span class="eval">${usd?.value?.toFixed(1)||'--'}</span></div>
@@ -1540,6 +1545,9 @@ function renderRight(){
     </div>
     <div class="g-panel right-delta">
       <div class="sec-head"><h3>${t('panels.sweepDelta','Sweep Delta')}</h3><span class="badge ${dirClass}">${dirEmoji} ${ds.direction?t('delta.'+ds.direction,ds.direction.toUpperCase()):t('delta.baseline','BASELINE')}</span></div>
+      ${delta.correlation?.active ? `<div style="margin-bottom:8px;padding:6px 8px;border:1px solid ${riskLevelColor(delta.correlation.severity==='critical'?'critical':'high')};background:rgba(255,171,64,0.06);font-family:var(--mono);font-size:9px;color:${riskLevelColor(delta.correlation.severity==='critical'?'critical':'high')};line-height:1.5">
+        &#9888; ${t('delta.correlationActive','CROSS-STREAM CORRELATION')}: <strong>${delta.correlation.severity.toUpperCase()}</strong><br>${delta.correlation.domainsTriggered.join(' &middot; ')}
+      </div>` : ''}
       ${hasDelta?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;font-family:var(--mono);font-size:10px">
         <span style="color:var(--dim)">${t('delta.changes','Changes')}: <span style="color:var(--accent)">${ds.totalChanges}</span></span>
         <span style="color:var(--dim)">${t('delta.critical','Critical')}: <span style="color:${ds.criticalChanges>0?'var(--warn)':'var(--dim)'}">${ds.criticalChanges||0}</span></span>
@@ -1551,6 +1559,7 @@ function renderRight(){
 
 // === HELPERS ===
 function getAge(d){const ms=Date.now()-new Date(d).getTime();const h=Math.floor(ms/3600000);if(h<1)return 'just now';if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
+function riskLevelColor(level){return {low:'var(--accent)',elevated:'#ffe082',high:'#ffab40',critical:'var(--warn)'}[level]||'var(--dim)'}
 function cleanText(t){return t.replace(/&#39;/g,"'").replace(/&#33;/g,"!").replace(/&amp;/g,"&").replace(/<[^>]+>/g,'')}
 function safeExternalUrl(raw){try{const u=new URL(raw,location.href);return u.protocol==='http:'||u.protocol==='https:'?u.toString():null}catch{return null}}
 
