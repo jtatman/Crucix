@@ -36,7 +36,7 @@ const startTime = Date.now();
 const sseClients = new Set();
 
 // === Delta/Memory ===
-const memory = new MemoryManager(RUNS_DIR);
+const memory = new MemoryManager(RUNS_DIR, config.delta.thresholds);
 
 // === LLM + Telegram + Discord ===
 const llmProvider = createLLMProvider(config.llm);
@@ -103,6 +103,17 @@ if (telegramAlerter.isConfigured) {
       sections.push(`${dirEmoji} Direction: *${delta.summary.direction.toUpperCase()}* | ${delta.summary.totalChanges} changes, ${delta.summary.criticalChanges} critical`);
       sections.push('');
     }
+
+    // Composite risk index + cross-stream correlation
+    const risk = currentData.riskIndex;
+    if (risk) {
+      const riskEmoji = { low: '🟢', elevated: '🟡', high: '🟠', critical: '🔴' }[risk.level] || '⚪';
+      sections.push(`${riskEmoji} Risk Index: *${risk.score}/100* (${risk.level.toUpperCase()})`);
+    }
+    if (delta?.correlation?.active) {
+      sections.push(`🔗 Correlation: *${delta.correlation.severity.toUpperCase()}* — ${delta.correlation.domainsTriggered.join(', ')}`);
+    }
+    if (risk || delta?.correlation?.active) sections.push('');
 
     // Key metrics
     const vix = currentData.fred?.find(f => f.id === 'VIXCLS');
@@ -194,6 +205,17 @@ if (discordAlerter.isConfigured) {
       const dirEmoji = { 'risk-off': '📉', 'risk-on': '📈', 'mixed': '↔️' }[delta.summary.direction] || '↔️';
       sections.push(`${dirEmoji} Direction: **${delta.summary.direction.toUpperCase()}** | ${delta.summary.totalChanges} changes, ${delta.summary.criticalChanges} critical\n`);
     }
+
+    // Composite risk index + cross-stream correlation
+    const risk = currentData.riskIndex;
+    if (risk) {
+      const riskEmoji = { low: '🟢', elevated: '🟡', high: '🟠', critical: '🔴' }[risk.level] || '⚪';
+      sections.push(`${riskEmoji} Risk Index: **${risk.score}/100** (${risk.level.toUpperCase()})`);
+    }
+    if (delta?.correlation?.active) {
+      sections.push(`🔗 Correlation: **${delta.correlation.severity.toUpperCase()}** — ${delta.correlation.domainsTriggered.join(', ')}`);
+    }
+    if (risk || delta?.correlation?.active) sections.push('');
 
     const vix = currentData.fred?.find(f => f.id === 'VIXCLS');
     const hy = currentData.fred?.find(f => f.id === 'BAMLH0A0HYM2');

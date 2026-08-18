@@ -12,6 +12,7 @@ import { exec } from 'child_process';
 import config from '../crucix.config.mjs';
 import { createLLMProvider } from '../lib/llm/index.mjs';
 import { generateLLMIdeas } from '../lib/llm/ideas.mjs';
+import { computeRiskIndex } from '../lib/risk/index.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -614,6 +615,9 @@ export async function synthesize(data) {
     // newsFeed for ticker (merged RSS + GDELT + Telegram)
     newsFeed: buildNewsFeed(news, gdeltData, tgUrgent, tgTop),
   };
+
+  // Composite risk index — computed from this sweep's data, not a delta
+  V2.riskIndex = computeRiskIndex(V2, config.risk?.thresholds);
 
   return V2;
 }
