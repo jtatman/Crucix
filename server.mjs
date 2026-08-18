@@ -310,6 +310,12 @@ app.get('/api/locales', (req, res) => {
   });
 });
 
+// API: recent sweep history (compact data + delta per run, hot window only)
+app.get('/api/history', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 3, 3);
+  res.json({ runs: memory.getRunHistory(limit) });
+});
+
 // SSE: live updates
 app.get('/events', (req, res) => {
   res.writeHead(200, {

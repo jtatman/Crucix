@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "description": "Local intelligence engine - 27 OSINT sources, live dashboard, public demo at crucix.live, auto-refresh, optional LLM layer.",
   "type": "module",
+  "bin": {
+    "crucix-mcp": "mcp/server.mjs"
+  },
   "scripts": {
     "start": "node server.mjs",
     "dev": "node --trace-warnings server.mjs",
@@ -10,6 +13,7 @@
     "inject": "node dashboard/inject.mjs",
     "brief": "node apis/briefing.mjs",
     "brief:save": "node apis/save-briefing.mjs",
+    "mcp": "node mcp/server.mjs",
     "diag": "node diag.mjs",
     "clean": "node scripts/clean.mjs",
     "fresh-start": "npm run clean && npm start"
