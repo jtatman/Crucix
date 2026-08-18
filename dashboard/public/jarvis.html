@@ -1763,17 +1763,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const hasInlineData = !!(D && D.meta);
   const canProbeApi = location.protocol !== 'file:';
 
-  if (canProbeApi && !hasInlineData) {
-    // Server mode: always fetch live data from API (ignore any stale inline D)
+  if (canProbeApi) {
+    // Server mode: this static file may have stale inline data baked in from
+    // the last `npm run inject` run committed to disk — the running server is
+    // always the source of truth. Paint the inline data (if any) immediately
+    // to avoid a blank flash, then overwrite it with a live fetch and hand
+    // off to SSE. Do NOT skip the fetch just because inline data is present.
+    if (hasInlineData) init();
     fetch('/api/data')
       .then(r => r.json())
-      .then(data => { D = data; init(); connectSSE(); })
+      .then(data => { D = data; init(); })
       .catch(() => {
-        // Should not reach here — server routes to loading.html when no data
-        if (D && D.meta) { init(); connectSSE(); }
-      });
+        // First sweep may still be in progress; loading.html covers the
+        // true cold-start case, so this only matters if we had nothing to
+        // paint above.
+        if (!hasInlineData) return;
+      })
+      .finally(() => connectSSE());
   } else if (hasInlineData) {
-    // File mode: use inline data
+    // File mode (opened directly, no server): use inline data only
     init();
   }
 });
