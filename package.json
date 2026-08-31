@@ -1,7 +1,7 @@
 {
   "name": "crucix",
   "version": "2.0.0",
-  "description": "Local intelligence engine - 34 OSINT sources, live dashboard, public demo at crucix.live, auto-refresh, optional LLM layer.",
+  "description": "Local intelligence engine - 37 OSINT sources, live dashboard, public demo at crucix.live, auto-refresh, optional LLM layer.",
   "type": "module",
   "bin": {
     "crucix-mcp": "mcp/server.mjs"

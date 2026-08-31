@@ -586,6 +586,39 @@ export async function synthesize(data) {
     avgBullishPercent: fhData.avgBullishPercent ?? null,
   };
 
+  // GDACS — multi-hazard disaster feed (cyclones/floods/volcanoes/wildfires,
+  // complements the USGS earthquake-only feed)
+  const gdacsData = data.sources.GDACS || {};
+  const gdacs = {
+    count: gdacsData.count || 0,
+    redCount: gdacsData.redCount || 0,
+    orangeCount: gdacsData.orangeCount || 0,
+    greenCount: gdacsData.greenCount || 0,
+    maxAlertLevel: gdacsData.maxAlertLevel || null,
+    maxAlertLevelNum: gdacsData.maxAlertLevelNum ?? null,
+    byEventType: gdacsData.byEventType || {},
+    events: (gdacsData.events || []).slice(0, 20),
+  };
+
+  // Open-Meteo — global forecast overlay for 12 curated locations
+  const omData = data.sources['Open-Meteo'] || {};
+  const openMeteo = {
+    locationsMonitored: omData.locationsMonitored || 0,
+    severeCount: omData.severeCount || 0,
+    locations: omData.locations || [],
+  };
+
+  // NOAA SWPC — geomagnetic storm / space weather
+  const swpcData = data.sources.SWPC || {};
+  const swpc = {
+    kp: swpcData.kp ?? null,
+    kpTime: swpcData.kpTime || null,
+    aRunning: swpcData.aRunning ?? null,
+    gScale: swpcData.gScale || null,
+    alertCount: swpcData.alertCount || 0,
+    alerts: (swpcData.alerts || []).slice(0, 10),
+  };
+
   const health = Object.entries(data.sources).map(([name, src]) => ({
     n: name, err: Boolean(src.error), stale: Boolean(src.stale)
   }));
@@ -656,7 +689,7 @@ export async function synthesize(data) {
     sdr: { total: sdrNet.totalReceivers || 0, online: sdrNet.online || 0, zones: sdrZones },
     tg: { posts: tgData.totalPosts || 0, urgent: tgUrgent, topPosts: tgTop },
     who, fred, energy, metals, bls, treasury, gscpi, defense, noaa, epa, acled, gdelt, space, health, news,
-    ukraineAlerts, isw, alphavantage, earthquakes, finnhub,
+    ukraineAlerts, isw, alphavantage, earthquakes, finnhub, gdacs, openMeteo, swpc,
     markets, // Live Yahoo Finance market data
     ideas: [], ideasSource: 'disabled',
     // newsFeed for ticker (merged RSS + GDELT + Telegram)
