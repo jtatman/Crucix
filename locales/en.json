@@ -50,6 +50,7 @@
     "osintFeed": "OSINT Feed",
     "osintStream": "OSINT Stream",
     "nuclearWatch": "Nuclear Watch",
+    "ukraineAlerts": "Ukraine Air Alerts",
     "newsTicker": "Live News Ticker",
     "sweepDelta": "Sweep Delta",
     "macroMarkets": "Macro + Markets",
@@ -358,5 +359,11 @@
     "errors": {
       "noDataYet": "No data yet — first sweep in progress"
     }
+  },
+  "ukraineAlerts": {
+    "active": "ACTIVE",
+    "noActive": "No active air alerts",
+    "noData": "NO DATA",
+    "moreRegions": "+{count} more regions"
   }
 }

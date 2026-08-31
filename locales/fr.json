@@ -50,6 +50,7 @@
     "osintFeed": "Flux OSINT",
     "osintStream": "Flux OSINT",
     "nuclearWatch": "Surveillance Nucléaire",
+    "ukraineAlerts": "Alertes Aériennes Ukraine",
     "newsTicker": "Fil d'Actualités",
     "sweepDelta": "Changements",
     "macroMarkets": "Macro + Marchés",
@@ -358,5 +359,11 @@
     "errors": {
       "noDataYet": "Pas encore de données — premier scan en cours"
     }
+  },
+  "ukraineAlerts": {
+    "active": "ACTIF",
+    "noActive": "Aucune alerte aérienne active",
+    "noData": "PAS DE DONNÉES",
+    "moreRegions": "+{count} régions supplémentaires"
   }
 }

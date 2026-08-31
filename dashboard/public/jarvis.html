@@ -621,6 +621,8 @@ function renderLeftRail(){
     {name:t('layers.osintFeed','OSINT Feed'),count:D.tg.posts,dot:'incident',sub:`${D.tg.urgent.length} ${t('badges.urgent','urgent').toLowerCase()}`},
     {name:t('layers.spaceActivity','Satellites'),count:D.space?.militarySats||0,dot:'space',sub:`${D.space?.totalNewObjects||0} ${t('space.newLast30d','new (30d)')}`}
   ];
+  const uaAlerts=(D.ukraineAlerts?.activeAirAlerts||[]).slice().sort((a,b)=>a.ageMinutes-b.ageMinutes).slice(0,8);
+  const uaExtra=Math.max(0,(D.ukraineAlerts?.activeAirAlertCount||0)-uaAlerts.length);
   const allNormal=D.nuke.every(s=>!s.anom);
   const nukeHtml=D.nuke.map(s=>`<div class="site-row"><span>${s.site}</span><span class="site-val">${s.n>0?(s.cpm?.toFixed(1)||'--')+' CPM':'No data'}</span></div>`).join('');
   const vix=D.fred.find(f=>f.id==='VIXCLS');
@@ -634,6 +636,12 @@ function renderLeftRail(){
     <div class="g-panel">
       <div class="sec-head"><h3>${t('panels.sensorGrid','Sensor Grid')}</h3><span class="badge">${t('badges.live','LIVE')}</span></div>
       ${layers.map(l=>`<div class="layer-item"><div class="layer-left"><div class="ldot ${l.dot}"></div><div><div class="layer-name">${l.name}</div><div class="layer-sub">${l.sub}</div></div></div><div class="layer-count">${l.count}</div></div>`).join('')}
+    </div>
+    <div class="g-panel">
+      <div class="sec-head"><h3>${t('panels.ukraineAlerts','Ukraine Air Alerts')}</h3><span class="badge">${D.ukraineAlerts?.activeAirAlertCount||0} ${t('ukraineAlerts.active','ACTIVE')}</span></div>
+      ${uaAlerts.length ? uaAlerts.map(a=>`<div class="site-row"><span>${a.region}</span><span class="site-val">${a.ageMinutes}m ago</span></div>`).join('')
+        : `<div style="font-family:var(--mono);font-size:10px;color:var(--dim)">${D.ukraineAlerts ? t('ukraineAlerts.noActive','No active air alerts') : t('ukraineAlerts.noData','NO DATA')}</div>`}
+      ${uaExtra>0 ? `<div style="margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--dim)">${t('ukraineAlerts.moreRegions','+{count} more regions').replace('{count}',uaExtra)}</div>` : ''}
     </div>
     <div class="g-panel">
       <div class="sec-head"><h3>${t('panels.nuclearWatch','Nuclear Watch')}</h3><span class="badge">${t('badges.radiation','RADIATION')}</span></div>
