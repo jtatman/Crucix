@@ -537,7 +537,53 @@ export async function synthesize(data) {
     topTitles: (gdeltData.allArticles || []).slice(0, 5).map(a => a.title?.substring(0, 80)),
     geoPoints: (gdeltData.geoPoints || []).slice(0, 20).map(p => ({
       lat: p.lat, lon: p.lon, name: (p.name || '').substring(0, 80), count: p.count || 1
-    }))
+    })),
+    mediaVolume: gdeltData.mediaVolume || { surging: false, ratio: null },
+  };
+
+  // Ukraine air-raid siren network (siren.pp.ua) — real-time, machine-generated,
+  // independent of any Telegram channel's framing
+  const uaAlertsData = data.sources['Ukraine-Alerts'] || {};
+  const ukraineAlerts = {
+    activeAirAlertCount: uaAlertsData.activeAirAlertCount || 0,
+    activeAirAlerts: (uaAlertsData.activeAirAlerts || []).slice(0, 20),
+  };
+
+  // ISW daily campaign assessments (Russia-Ukraine + Iran) — throttled to
+  // ~once/day at the source, see apis/sources/isw.mjs
+  const iswData = data.sources.ISW || {};
+  const isw = {
+    assessments: (iswData.assessments || []).map(a => ({
+      label: a.label, title: a.title, url: a.url, keyTakeaways: a.keyTakeaways || [],
+    })),
+  };
+
+  // Alpha Vantage market news sentiment — throttled to ~once/day, see
+  // apis/sources/alphavantage.mjs
+  const avData = data.sources.AlphaVantage || {};
+  const alphavantage = {
+    avgSentimentScore: avData.avgSentimentScore ?? null,
+    articleCount: avData.articleCount || 0,
+    topArticles: (avData.articles || []).slice(0, 10),
+  };
+
+  // USGS real-time earthquake feed (M4.5+, past 24h)
+  const usgsData = data.sources['USGS-Earthquake'] || {};
+  const earthquakes = {
+    count: usgsData.count || 0,
+    maxMagnitude: usgsData.maxMagnitude || 0,
+    tsunamiWarnings: usgsData.tsunamiWarnings || 0,
+    pagerAlerts: usgsData.pagerAlerts || 0,
+    quakes: (usgsData.quakes || []).slice(0, 15),
+  };
+
+  // Finnhub market news + per-sector sentiment
+  const fhData = data.sources.Finnhub || {};
+  const finnhub = {
+    articleCount: fhData.articleCount || 0,
+    topArticles: (fhData.articles || []).slice(0, 10),
+    sectorSentiment: fhData.sectorSentiment || [],
+    avgBullishPercent: fhData.avgBullishPercent ?? null,
   };
 
   const health = Object.entries(data.sources).map(([name, src]) => ({
@@ -610,6 +656,7 @@ export async function synthesize(data) {
     sdr: { total: sdrNet.totalReceivers || 0, online: sdrNet.online || 0, zones: sdrZones },
     tg: { posts: tgData.totalPosts || 0, urgent: tgUrgent, topPosts: tgTop },
     who, fred, energy, metals, bls, treasury, gscpi, defense, noaa, epa, acled, gdelt, space, health, news,
+    ukraineAlerts, isw, alphavantage, earthquakes, finnhub,
     markets, // Live Yahoo Finance market data
     ideas: [], ideasSource: 'disabled',
     // newsFeed for ticker (merged RSS + GDELT + Telegram)

@@ -89,13 +89,48 @@ function compactArticle(a) {
 // GDELT rate limit: 1 request per 5 seconds
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+// Broad geopolitical query shared across modes. Timeline modes (TimelineVol,
+// TimelineTone) require OR'd terms to be parenthesized or GDELT rejects the
+// query outright; ArtList tolerates either form, so use the parenthesized
+// form everywhere for consistency.
+const BROAD_QUERY = '(conflict OR military OR economy OR crisis OR war OR sanctions OR tariff OR strike OR outbreak)';
+
+/**
+ * Detect whether global media volume on the broad geopolitical query is
+ * currently spiking relative to its own recent baseline. This is an
+ * independent "is global media attention on this actually moving right now"
+ * signal, decoupled from any single Telegram channel's framing — used to
+ * corroborate (or fail to corroborate) keyword-matched OSINT alerts rather
+ * than trusting a single source's claim of urgency.
+ */
+export function detectVolumeSurge(timelineData, opts = {}) {
+  const { recentBuckets = 4, surgeRatio = 1.25 } = opts;
+  const points = timelineData?.timeline?.[0]?.data || [];
+  if (points.length < recentBuckets + 8) {
+    return { surging: false, ratio: null, reason: 'insufficient timeline data' };
+  }
+
+  const values = points.map(p => p.value).filter(v => typeof v === 'number');
+  const recent = values.slice(-recentBuckets);
+  const baseline = values.slice(0, -recentBuckets);
+  const mean = (arr) => arr.reduce((s, v) => s + v, 0) / arr.length;
+
+  const recentMean = mean(recent);
+  const baselineMean = mean(baseline);
+  const ratio = baselineMean > 0 ? recentMean / baselineMean : 0;
+
+  return {
+    surging: ratio >= surgeRatio,
+    ratio: parseFloat(ratio.toFixed(2)),
+    recentMean: parseFloat(recentMean.toFixed(2)),
+    baselineMean: parseFloat(baselineMean.toFixed(2)),
+  };
+}
+
 // Briefing mode — get top global events summary (sequential due to rate limit)
 export async function briefing() {
   // Single broad query to stay within rate limits
-  const all = await searchEvents(
-    'conflict OR military OR economy OR crisis OR war OR sanctions OR tariff OR strike OR outbreak',
-    { maxRecords: 50, timespan: '24h' }
-  );
+  const all = await searchEvents(BROAD_QUERY, { maxRecords: 50, timespan: '24h' });
 
   const articles = (all?.articles || []).map(compactArticle);
 
@@ -118,12 +153,21 @@ export async function briefing() {
     }));
   } catch (e) { /* geo endpoint optional — don't break briefing */ }
 
+  // Media volume trend — separate API call, respects rate limit
+  await delay(5500);
+  let mediaVolume = { surging: false, ratio: null };
+  try {
+    const vol = await volumeTrend(BROAD_QUERY, '24h');
+    mediaVolume = detectVolumeSurge(vol);
+  } catch (e) { /* volume trend optional — don't break briefing */ }
+
   return {
     source: 'GDELT',
     timestamp: new Date().toISOString(),
     totalArticles: articles.length,
     allArticles: articles,
     geoPoints,
+    mediaVolume,
     conflicts: categorize(['military', 'conflict', 'war', 'strike', 'missile', 'attack', 'bomb', 'troops']),
     economy: categorize(['economy', 'recession', 'inflation', 'market', 'sanctions', 'tariff', 'trade', 'gdp']),
     health: categorize(['pandemic', 'outbreak', 'epidemic', 'disease', 'virus', 'health']),

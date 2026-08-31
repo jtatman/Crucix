@@ -8,8 +8,14 @@ import '../utils/env.mjs';
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// Curated list of well-known public OSINT / conflict / geopolitics channels
-// All verified to have public web previews enabled at https://t.me/s/{id}
+// Curated list of well-known public OSINT / conflict / geopolitics channels.
+// Verified live (2026-08-31) by following https://t.me/s/{id} and checking
+// both reachability AND recent post activity — a channel can be reachable
+// but dormant for years (found dragonwatch/middleeastobserver this way, both
+// rejected) or have its handle reclaimed by an unrelated private account
+// (found for the 4 channels these entries replaced: inikiforv, geaborning,
+// TheIntelligencer, unusual_whales — all silently returned 0 posts every
+// sweep despite counting as "monitored"). Re-verify before adding more.
 // Override with TELEGRAM_CHANNELS env var (comma-separated channel IDs)
 const DEFAULT_CHANNELS = [
   // === Conflict: Ukraine/Russia ===
@@ -26,13 +32,13 @@ const DEFAULT_CHANNELS = [
   { id: 'GeneralStaffZSU',   label: 'General Staff ZSU',   topic: 'conflict',    note: 'Ukrainian General Staff official' },
   // === Middle East ===
   { id: 'middleeastosint',   label: 'Middle East OSINT',   topic: 'osint',       note: 'Middle East open source intel' },
-  { id: 'inikiforv',         label: 'Nikiforov OSINT',     topic: 'osint',       note: 'Cross-regional OSINT analyst' },
-  // === Geopolitics & Analysis ===
-  { id: 'geaborning',        label: 'Geo A. Borning',      topic: 'geopolitics', note: 'Geopolitical analysis and forecasting' },
-  { id: 'TheIntelligencer',  label: 'The Intelligencer',   topic: 'osint',       note: 'Intelligence community news' },
+  // === Global / cross-theater (replaces 3 dead single-theater channels — see note above) ===
+  { id: 'osintdefender',     label: 'OSINTdefender',       topic: 'osint',       note: 'Global OSINT alerts across theaters (was: inikiforv, dead)' },
+  { id: 'geopolitics_prime', label: 'Geopolitics Prime',   topic: 'geopolitics', note: 'Iran and global power dynamics (was: geaborning, dead)' },
+  { id: 'war_monitor',       label: 'War Monitor',         topic: 'osint',       note: 'Global crisis flashpoints beyond Russia/Ukraine (was: TheIntelligencer, dead)' },
+  { id: 'ClashReport',       label: 'Clash Report',        topic: 'conflict',    note: 'Global battlefield footage, not theater-specific (was: unusual_whales, dead — no live finance-Telegram replacement found, see CLAUDE.md)' },
   // === Markets & Finance ===
   { id: 'WallStreetSilver',  label: 'Wall St Silver',      topic: 'finance',     note: 'Commodities and macro commentary' },
-  { id: 'unusual_whales',    label: 'Unusual Whales',      topic: 'finance',     note: 'Market flow and options analysis' },
 ];
 
 // Allow user to add custom channels via env var

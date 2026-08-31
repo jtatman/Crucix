@@ -46,3 +46,10 @@ MAINTAINER_DECISIONS.local.md
 
 # Local deploy config
 dashboard/public/vercel.json
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*

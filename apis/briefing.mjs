@@ -36,6 +36,11 @@ import { briefing as bluesky } from './sources/bluesky.mjs';
 import { briefing as reddit } from './sources/reddit.mjs';
 import { briefing as telegram } from './sources/telegram.mjs';
 import { briefing as kiwisdr } from './sources/kiwisdr.mjs';
+import { briefing as ukraineAlerts } from './sources/ukraine-alerts.mjs';
+import { briefing as isw } from './sources/isw.mjs';
+import { briefing as alphavantage } from './sources/alphavantage.mjs';
+import { briefing as usgsEarthquake } from './sources/usgs-earthquake.mjs';
+import { briefing as finnhub } from './sources/finnhub.mjs';
 
 // === Tier 4: Space & Satellites ===
 import { briefing as space } from './sources/space.mjs';
@@ -67,7 +72,7 @@ export async function runSource(name, fn, ...args) {
 }
 
 export async function fullBriefing() {
-  console.error('[Crucix] Starting intelligence sweep — 29 sources...');
+  console.error('[Crucix] Starting intelligence sweep — 34 sources...');
   const start = Date.now();
 
   const allPromises = [
@@ -101,6 +106,11 @@ export async function fullBriefing() {
     runSource('Reddit', reddit),
     runSource('Telegram', telegram),
     runSource('KiwiSDR', kiwisdr),
+    runSource('Ukraine-Alerts', ukraineAlerts),
+    runSource('ISW', isw),
+    runSource('AlphaVantage', alphavantage),
+    runSource('USGS-Earthquake', usgsEarthquake),
+    runSource('Finnhub', finnhub),
 
     // Tier 4: Space & Satellites
     runSource('Space', space),
