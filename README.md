@@ -229,13 +229,17 @@ Set `LLM_PROVIDER` to one of: `anthropic`, `openai`, `gemini`, `codex`, `openrou
 | Provider | Key Required | Default Model |
 |----------|-------------|---------------|
 | `anthropic` | `LLM_API_KEY` | claude-sonnet-4-6 |
-| `openai` | `LLM_API_KEY` | gpt-5.4 |
+| `openai` | `LLM_API_KEY` (optional if `OPENAI_BASE_URL` points at a local server) | gpt-5.4 |
 | `gemini` | `LLM_API_KEY` | gemini-3.1-pro |
 | `openrouter` | `LLM_API_KEY` | openrouter/auto |
 | `codex` | None (uses `~/.codex/auth.json`) | gpt-5.3-codex |
 | `minimax` | `LLM_API_KEY` | MiniMax-M2.5 |
 | `mistral` | `LLM_API_KEY` | mistral-large-latest |
 | `grok` | `LLM_API_KEY` | grok-4-latest |
+
+Set `OPENAI_BASE_URL` to route `openai` at a self-hosted OpenAI-compatible server — llama.cpp's
+`llama-server`, vLLM, LM Studio, etc. — instead of the real OpenAI API. No `LLM_API_KEY` is required in
+that case (set `LLM_MODEL` to whatever model name your local server exposes).
 
 For Codex, run `npx @openai/codex login` to authenticate via your ChatGPT subscription.
 
@@ -429,6 +433,8 @@ All settings are in `.env` with sensible defaults:
 | `LLM_PROVIDER` | disabled | `anthropic`, `openai`, `gemini`, `codex`, `openrouter`, `minimax`, `mistral`, or `grok` |
 | `LLM_API_KEY` | — | API key (not needed for codex) |
 | `LLM_MODEL` | per-provider default | Override model selection |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server address (provider: `ollama`) |
+| `OPENAI_BASE_URL` | `https://api.openai.com` | Point provider `openai` at a local llama.cpp/vLLM/LM Studio server instead |
 | `TELEGRAM_BOT_TOKEN` | disabled | For Telegram alerts + bot commands |
 | `TELEGRAM_CHAT_ID` | — | Your Telegram chat ID |
 | `TELEGRAM_CHANNELS` | — | Extra channel IDs to monitor (comma-separated) |

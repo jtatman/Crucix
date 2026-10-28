@@ -11,7 +11,15 @@ export default {
     provider: process.env.LLM_PROVIDER || null, // anthropic | openai | gemini | codex | openrouter | minimax | mistral | ollama | grok
     apiKey: process.env.LLM_API_KEY || null,
     model: process.env.LLM_MODEL || null,
-    baseUrl: process.env.OLLAMA_BASE_URL || null,
+    // Only the active provider's own base-URL var applies — otherwise a
+    // leftover OLLAMA_BASE_URL from a previous setup would silently win over
+    // OPENAI_BASE_URL (or vice versa) if both happen to be set at once.
+    // OPENAI_BASE_URL points provider:openai at any OpenAI-compatible server
+    // (llama.cpp's llama-server, vLLM, LM Studio, ...) instead of the real
+    // OpenAI API — they all implement the same /v1/chat/completions shape.
+    baseUrl: (process.env.LLM_PROVIDER === 'ollama' ? process.env.OLLAMA_BASE_URL
+      : process.env.LLM_PROVIDER === 'openai' ? process.env.OPENAI_BASE_URL
+      : null) || null,
   },
 
   telegram: {
